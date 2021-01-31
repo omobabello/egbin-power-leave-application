@@ -35,12 +35,12 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <router-link
               class="dropdown-item"
-              to="/admin/leaverequests?type=approved"
+              to="approvedrequests"
               >Approved</router-link
             >
             <router-link
               class="dropdown-item"
-              to="/admin/leaverequests?type=rejected"
+              to="rejectedrequests"
               >Rejected</router-link
             >
           </div>
@@ -60,17 +60,17 @@
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <router-link
               class="dropdown-item"
-              to="/admin/leaverequests?type=approved"
+              to="pendingstaffrequests"
               >Pending</router-link
             >
             <router-link
               class="dropdown-item"
-              to="/admin/leaverequests?type=approved"
+              to="approvedstaffrequests"
               >Approved</router-link
             >
             <router-link
               class="dropdown-item"
-              to="/admin/leaverequests?type=rejected"
+              to="rejectedstaffrequests"
               >Rejected</router-link
             >
           </div>

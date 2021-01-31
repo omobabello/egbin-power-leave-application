@@ -68,7 +68,14 @@ export default {
     };
   },
   created() {
-    this.getStaffs();
+    if (
+      !!sessionStorage.getItem("usertype") &&
+      sessionStorage.getItem("usertype") == "admin"
+    ) {
+      this.getStaffs();
+    } else {
+      this.$router.push("/Login");
+    }
   },
   methods: {
     async getStaffs() {
@@ -98,7 +105,9 @@ export default {
                   Manager: ${result.data.staff.Manager} <hr/>
                   Exam Leave: ${result.data.staff.ExamLeaveBalance} <hr/>
                   Sick Leave: ${result.data.staff.SickLeaveBalance} <hr/>
-                  Compassionate Leave: ${result.data.staff.CompassionateLeaveBalance} <hr/>
+                  Compassionate Leave: ${
+                    result.data.staff.CompassionateLeaveBalance
+                  } <hr/>
                   Annual Leave: ${result.data.staff.AnnualLeaveBalance}`;
       swal({
         title: "Staff Info",

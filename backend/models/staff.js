@@ -6,11 +6,14 @@ const { reject } = require('lodash');
 
 module.exports = {
     getStaffById(staff) {
-        const query = `SELECT * FROM staffs WHERE ID = ${staff}`;
+        const query = `SELECT s.*, concat(alt.FirstName, ' ', alt.LastName) as Manager
+                       FROM staffs as s
+                       LEFT JOIN staffs as alt on s.ID = alt.LineManager 
+                       WHERE s.ID = '${staff}'`;
         return new Promise((resolve, reject) => {
             db.query(query, (error, data) => {
                 if (error) reject(error);
-                resolve(data[0]);
+                resolve(!!data ? data[0] : null);
             });
         });
     },

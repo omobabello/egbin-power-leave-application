@@ -2,6 +2,15 @@ const db = require('../database/dbconnection');
 const uuid = require('uuid');
 const moment = require('moment');
 module.exports = {
+    getLeave(leave){
+        const query = `SELECT * FROM leaverequests WHERE LeaveID = '${leave}'`;
+        return new Promise((resolve,reject) => {
+            db.query(query, (error, data) => {
+                if(error) reject(error); 
+                resolve(data[0]);
+            });
+        });
+    },
     requestLeave(leave) {
         leave.LeaveID = uuid();
         leave.DateRequested = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -128,6 +137,19 @@ module.exports = {
             });
         });
     },
+    getAdminApprovedLeaveReqeusts() {
+        const query = `SELECT lr.*, ar.* , concat(s.FirstName,' ',s.LastName) as Requester
+                       FROM approvedleaverequests as ar
+                       JOIN leaverequests as lr ON ar.LeaveID = lr.LeaveID
+                       LEFT JOIN staffs as s ON lr.RequestedBy = s.ID`;
+
+        return new Promise((resolve, reject) => {
+            db.query(query, (error, data) => {
+                if (error) reject(error);
+                resolve(data);
+            });
+        });
+    },
     getStaffsRejectedLeaveRequests(staff) {
         const query = `SELECT lr.*, rr.* , concat(s.FirstName,' ',s.LastName) as Rejecter
                        FROM leaverequests as lr
@@ -156,4 +178,17 @@ module.exports = {
             });
         });
     },
+    getAdminRejectedLeaveRequests() {
+        const query = `SELECT lr.*, rr.*, concat(s.FirstName,' ',s.LastName) as Requester
+        FROM rejectedleaverequests as rr 
+        JOIN leaverequests as lr ON rr.LeaveID = lr.LeaveID
+        LEFT JOIN staffs as s ON lr.RequestedBy = s.ID`;
+
+        return new Promise((resolve, reject) => {
+            db.query(query, (error, data) => {
+                if (error) reject(error);
+                resolve(data);
+            });
+        });
+    }
 }

@@ -61,7 +61,7 @@
         </div>
       </div>
       <div class="card-footer">
-        <router-link to="/admin/home" class="btn btn-secondary"
+        <router-link to="/home" class="btn btn-secondary"
           >Cancel <i class="fa fa-times"></i
         ></router-link>
         <button
@@ -95,6 +95,11 @@ export default {
       today: moment().format("YYYY-MM-DD"),
       msg: "",
     };
+  },
+  created() {
+    if (!sessionStorage.getItem("staffInfo")) {
+      this.$router.push("/Login");
+    }
   },
   methods: {
     async requestLeave() {

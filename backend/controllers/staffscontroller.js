@@ -82,7 +82,7 @@ const routes = (app) => {
         try {
             const staff = await Staffs.createStaff(request.body);
             return response.json({
-                status: true,
+                success: true,
                 staff
             });
         } catch (error) {
@@ -93,12 +93,11 @@ const routes = (app) => {
         }
     });
 
-    app.put('/staffs/:id', async (request, response) => {
+    app.put('/staffs', async (request, response) => {
         try {
-            let staff = await Staffs.getStaffById(request.params.id);
+            let staff = await Staffs.getStaffById(request.body.ID);
             if (!!staff) {
-                staff = { ID: request.params.id, ...request.body };
-                let updatedStaff = await Staffs.updateStaff(staff);
+                let updatedStaff = await Staffs.updateStaff(request.body);
                 response.json({
                     success: true,
                     data: updatedStaff

@@ -2,7 +2,7 @@
   <div class="container">
     <Header />
     <div class="card">
-      <div class="card-header">New Request</div>
+      <div class="card-header">Edit Request</div>
       <div class="card-body">
         <div
           class="alert alert-danger"
@@ -61,7 +61,7 @@
         </div>
       </div>
       <div class="card-footer">
-        <router-link to="/admin/home" class="btn btn-secondary"
+        <router-link to="/home" class="btn btn-secondary"
           >Cancel <i class="fa fa-times"></i
         ></router-link>
         <button
@@ -90,20 +90,32 @@ export default {
     return {
       user: JSON.parse(sessionStorage.getItem("staffInfo")),
       leave: {},
-      linemanagers: [],
       disableButton: false,
       today: moment().format("YYYY-MM-DD"),
       msg: "",
     };
   },
+  created(){
+    if (!!sessionStorage.getItem("staffInfo")) {
+         this.getLeave(this.$route.query.leave);
+    } else {
+      this.$router.push("/Login");
+    }
+
+  },
   methods: {
+    async getLeave(leave){
+      const result =  await axios.get(`${Endpoints.Leave}/${leave}`); 
+      this.leave = result.data.leave; 
+      console.log(result);
+    },
     async requestLeave() {
       if (this.validate()) {
         this.disableButton = true;
         try {
           this.leave.RequestedBy = this.user.ID;
           console.log(this.leave);
-          const result = await axios.post(Endpoints.Leave, { ...this.leave });
+          const result = await axios.put(Endpoints.Leave, { ...this.leave });
           console.log(result);
           if (result.data.success) {
             this.$router.push("/home");

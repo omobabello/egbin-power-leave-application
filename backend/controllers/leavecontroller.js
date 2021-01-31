@@ -2,6 +2,7 @@ const Leave = require('../models/leave');
 const moment = require('moment');
 require('moment-business-days');
 const { getStaffById, getLeaveBalance } = require('../models/staff');
+const { request } = require('express');
 const routes = (app) => {
 
     app.post('/leave', async (request, response) => {
@@ -30,11 +31,26 @@ const routes = (app) => {
         }
     });
 
+    app.get('/leave/:id', async (request, response) => {
+        try {
+            const leave = await Leave.getLeave(request.params.id);
+            response.json({
+                success: true,
+                leave
+            })
+        } catch (error) {
+            response.json({
+                success: false,
+                error: error.toString()
+            })
+        }
+    });
+
     app.put('/leave', async (request, response) => {
         try {
-            const leave = await Leave.editLeave(request.body); 
+            const leave = await Leave.editLeave(request.body);
             response.json({
-                success: true, 
+                success: true,
                 leave
             });
         } catch (error) {
@@ -48,7 +64,7 @@ const routes = (app) => {
 
     app.delete('/leave/:id', async (request, response) => {
         try {
-            const data = await Leave.deleteLeave(request.params.id); 
+            const data = await Leave.deleteLeave(request.params.id);
             const message = !!data ? 'Request Deleted' : 'Request Not Found';
             response.json({
                 success: true,
@@ -56,7 +72,7 @@ const routes = (app) => {
             })
         } catch (error) {
             response.json({
-                success: false, 
+                success: false,
                 error: error.toString()
             })
         }
@@ -72,7 +88,7 @@ const routes = (app) => {
                 const leave = {
                     LeaveID: request.body.LeaveID,
                     ApprovedBy: request.body.ApprovedBy,
-                    Comment: request.body.Comment,
+                    ApprovalComment: request.body.ApprovalComment,
                     LeaveBalanceBefore,
                     LeaveBalanceAfter
                 };
@@ -100,7 +116,7 @@ const routes = (app) => {
 
     app.post('/rejectleave', async (request, response) => {
         try {
-            const rejection = await Leave.rejectleave(request.body);
+            const rejection = await Leave.rejectLeave(request.body);
             response.json({
                 success: false,
                 rejection
@@ -116,14 +132,14 @@ const routes = (app) => {
     app.get('/pendingleave/:requester/:id?', async (request, response) => {
         try {
             let leaves = null;
-            switch(request.params.requester){
-                case 'staff' : leaves = await Leave.getStaffsPendingLeaveRequests(request.params.id); break; 
-                case 'linemanager' : leaves = await Leave.getLineManagersPendingLeaveRequests(request.params.id); break; 
-                case 'admin' : leaves = await Leave.getAdminPendingLeaveRequests(); break;
+            switch (request.params.requester) {
+                case 'staff': leaves = await Leave.getStaffsPendingLeaveRequests(request.params.id); break;
+                case 'linemanager': leaves = await Leave.getLineManagersPendingLeaveRequests(request.params.id); break;
+                case 'admin': leaves = await Leave.getAdminPendingLeaveRequests(); break;
                 default: return response.status(404).json(null);
             }
             response.json({
-                success: true, 
+                success: true,
                 leaves
             });
         } catch (error) {
@@ -134,41 +150,43 @@ const routes = (app) => {
         }
     });
 
-    app.get('/approvedleave/:requester/:id', async (request, response) => {
+    app.get('/approvedleave/:requester/:id?', async (request, response) => {
         try {
-            let leaves = null; 
-            switch(request.params.requester){
-                case 'staff' : leaves = await Leave.getStaffsApprovedLeaveRequests(request.params.id); break; 
+            let leaves = null;
+            switch (request.params.requester) {
+                case 'staff': leaves = await Leave.getStaffsApprovedLeaveRequests(request.params.id); break;
                 case 'linemanager': leaves = await Leave.getLineManagersApprovedLeaveRequests(request.params.id); break;
+                case 'admin': leaves = await Leave.getAdminApprovedLeaveReqeusts(); break;
                 default: return response.status(404).json(null);
             }
             response.json({
-                success: true, 
+                success: true,
                 leaves
             })
         } catch (error) {
             response.json({
-                success: false, 
+                success: false,
                 error: error.toString()
             })
         }
     });
 
-    app.get('/rejectedleave/:requester/:id', async (request,response) => {
+    app.get('/rejectedleave/:requester/:id?', async (request, response) => {
         try {
-            let leaves = null; 
-            switch(request.params.requester){
+            let leaves = null;
+            switch (request.params.requester) {
                 case 'staff': leaves = await Leave.getStaffsRejectedLeaveRequests(request.params.id); break;
                 case 'linemanager': leaves = await Leave.getLineManagersRejectedLeaveRequests(request.params.id); break;
+                case 'admin': leaves = await Leave.getAdminRejectedLeaveRequests(); break;
                 default: return response.status(404).json(null);
             }
             response.json({
-                success: true, 
+                success: true,
                 leaves
             })
         } catch (error) {
             response.json({
-                success: false, 
+                success: false,
                 error: error.toString()
             });
         }

@@ -115,7 +115,14 @@ export default {
     };
   },
   created() {
-    this.getLineManagers();
+    if (
+      !!sessionStorage.getItem("usertype") &&
+      sessionStorage.getItem("usertype") == "admin"
+    ) {
+      this.getLineManagers();
+    } else {
+      this.$router.push("/Login");
+    }
   },
   methods: {
     async getLineManagers() {

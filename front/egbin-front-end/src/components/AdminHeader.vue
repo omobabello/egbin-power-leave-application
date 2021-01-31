@@ -31,9 +31,9 @@
            Requests
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <router-link class="dropdown-item" to="/admin/leaverequests">Pending</router-link>
-            <router-link class="dropdown-item" to="/admin/leaverequests?type=approved">Approved</router-link> 
-            <router-link class="dropdown-item" to="/admin/leaverequests?type=rejected">Rejected</router-link> 
+            <router-link class="dropdown-item" to="/admin/pendingrequests">Pending</router-link>
+            <router-link class="dropdown-item" to="/admin/approvedrequests">Approved</router-link> 
+            <router-link class="dropdown-item" to="/admin/rejectedrequests">Rejected</router-link> 
           </div>
         </li>
           <li class="nav-item">

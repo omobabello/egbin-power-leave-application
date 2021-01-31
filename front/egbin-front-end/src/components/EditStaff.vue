@@ -130,11 +130,18 @@ export default {
     };
   },
   created() {
-    if (!this.$route.query.staff) {
-      this.$router.push("/admin/home");
+    if (
+      !!sessionStorage.getItem("usertype") &&
+      sessionStorage.getItem("usertype") == "admin"
+    ) {
+      if (!this.$route.query.staff) {
+        this.$router.push("/admin/home");
+      } else {
+        this.getLineManagers();
+        this.getStaff(this.$route.query.staff);
+      }
     } else {
-      this.getLineManagers();
-      this.getStaff(this.$route.query.staff);
+      this.$router.push("/Login");
     }
   },
   methods: {
@@ -150,7 +157,7 @@ export default {
       if (this.validate()) {
         this.staff.IsLineManager = !!this.staff.IsLineManager ? 1 : 0;
         delete this.staff.Passconf;
-        delete this.staff.Manager; 
+        delete this.staff.Manager;
         this.disableButton = true;
         try {
           const result = await axios.put(Endpoints.Staffs, { ...this.staff });

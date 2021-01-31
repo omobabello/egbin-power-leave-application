@@ -4,13 +4,11 @@
     <div class="card card-primary">
       <div class="card-header"></div>
       <div class="card-body">
-        <router-link to="/newleaverequest" class="btn btn-primary"
-          >New Request</router-link
-        ><br /><br />
         <table class="table table-striped table-dark">
           <thead>
             <tr>
               <th scope="col">Date Requested</th>
+              <th scope="col">Request By</th>
               <th scope="col">Request Type</th>
               <th scope="col">Request Comment</th>
               <th scope="col">Start Date</th>
@@ -21,25 +19,23 @@
           <tbody>
             <tr v-for="leave in leaves" :key="leave.LeaveID">
               <td scope="row">{{ leave.DateRequested | formatDate }}</td>
+              <td scope="row">{{ leave.Requester }}</td>
               <td>{{ leave.LeaveType | leaveType }}</td>
               <td>{{ leave.RequestComment }}</td>
               <td>{{ leave.StartDate | formatDate }}</td>
               <td>{{ leave.EndDate | formatDate }}</td>
               <td>
-                <router-link
-                  :to="{
-                    name: 'EditLeaveRequest',
-                    query: { leave: leave.LeaveID },
-                  }"
-                  class="btn btn-sm btn-info"
-                >
-                  <i class="fa fa-edit"></i>
-                </router-link>
                 <button
-                  @click="deleteLeave(leave.LeaveID)"
+                  @click="approveLeave(leave)"
+                  class="btn btn-sm btn-success"
+                >
+                  Approve
+                </button>
+                <button
+                  @click="rejectLeave(leave.LeaveID)"
                   class="btn btn-sm btn-danger"
                 >
-                  <i class="fa fa-trash-o"></i>
+                  Reject
                 </button>
               </td>
             </tr>
@@ -56,7 +52,7 @@ import swal from "sweetalert";
 import Endpoints from "../../static/Endpoints";
 import moment from "moment";
 export default {
-  name: "StaffLeaves",
+  name: "PendingStaffRequest",
   components: {
     Header,
   },
@@ -85,7 +81,7 @@ export default {
     async getLeaves() {
       try {
         const result = await axios.get(
-          `${Endpoints.PendingLeave}/staff/${this.user.ID}`
+          `${Endpoints.PendingLeave}/linemanager/${this.user.ID}`
         );
         this.leaves = result.data.leaves;
       } catch (error) {
@@ -93,33 +89,52 @@ export default {
         console.log(error);
       }
     },
-    async deleteLeave(leave) {
+    async rejectLeave(leave) {
+      const here = this;
       swal({
-        title: "Delete Request ?",
-        closeOnClickOutside: false,
-        icon: "warning",
-        text: "Delete all data relating to this request",
-        buttons: {
-          cancel: {
-            text: "Cancel",
-            value: null,
-            visible: true,
-            closeModal: true,
-            className: "btn btn-default",
-          },
-          confirm: {
-            text: "Delete",
-            value: "delete",
-            visible: true,
-            className: "btn btn-danger",
+        title: "Reject Products ?",
+        content: {
+          element: "textarea",
+          attributes: {
+            placeholder: "Reason for Rejection",
+            class: "form-control",
+            id: "txtRejectComment",
           },
         },
-      }).then(async (btn) => {
-        if (btn == "delete") {
-          await axios.delete(`${Endpoints.Leave}/${leave}`);
-          this.getLeaves();
-          swal("Request Deleted");
-        }
+      }).then(async () => {
+        const object = {
+          LeaveID: leave,
+          RejectionComment: document.getElementById("txtRejectComment").value,
+          RejectedBy: this.user.ID,
+        };
+        const result = await axios.post(Endpoints.RejectLeave, { ...object });
+        here.getLeaves();
+        if (result.data.success) swal("Request Rejected");
+      });
+    },
+    async approveLeave(leave) {
+      const here = this;
+      swal({
+        title: "Approve Products ?",
+        content: {
+          element: "textarea",
+          attributes: {
+            placeholder: "Comment",
+            class: "form-control",
+            id: "txtApprovalComment",
+          },
+        },
+      }).then(async () => {
+        const object = {
+          LeaveID: leave.LeaveID,
+          LeaveType: leave.LeaveType,
+          RequestedBy: leave.RequestedBy,
+          ApprovalComment: document.getElementById("txtApprovalComment").value,
+          ApprovedBy: this.user.ID,
+        };
+        const result = await axios.post(Endpoints.ApproveLeave, { ...object });
+        here.getLeaves();
+        if (result.data.success) swal("Request Approved");
       });
     },
   },
