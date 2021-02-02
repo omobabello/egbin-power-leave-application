@@ -1,6 +1,4 @@
-// const baseUrl = 'http://egbin-test-api.herokuapp.com'; 
-const baseUrl = 'http://localhost:3000';
-
+const baseUrl = 'http://egbin-test-api.herokuapp.com'; 
 const Endpoints = {
     Login: `${baseUrl}/login`,
     Staffs: `${baseUrl}/staffs`, 
