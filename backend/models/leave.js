@@ -22,10 +22,16 @@ module.exports = {
             });
         });
     },
-    approveLeave(leave) {
+    approveLeave(type,days,leave,staff) {
         leave.ApprovalID = uuid();
         leave.DateApproved = moment().format("YYYY-MM-DD HH:mm:ss");
-        const query = "INSERT INTO approvedleaverequests SET ? ";
+        let query = "INSERT INTO approvedleaverequests SET ? ;";
+        switch(type){
+            case 'examleave': query += `UPDATE staffs SET ExamLeaveBalance = ExamLeaveBalance - ${days} WHERE ID = ${staff}`; break; 
+            case 'compassionateleave': query += `UPDATE staffs SET CompassionateLeaveBalance = CompassionateLeaveBalace - ${days} WHERE ID = ${staff}`; break;
+            case 'annualleave': query += `UPDATE staffs SET AnnualLeaveBalance = AnnualLeaveBalance - ${days} WHERE ID = ${staff}`; break;
+            case 'sickleave': query += `UPDATE staffs SET SickLeaveBalance = SickLeaveBalance - ${days} WHERE ID = ${staff}`; break;
+        }
         return new Promise((resolve, reject) => {
             db.query(query, leave, (error, data) => {
                 if (error) reject(error);

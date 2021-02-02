@@ -126,9 +126,7 @@ export default {
         },
       }).then(async () => {
         const object = {
-          LeaveID: leave.LeaveID,
-          LeaveType: leave.LeaveType,
-          RequestedBy: leave.RequestedBy,
+          ...leave,
           ApprovalComment: document.getElementById("txtApprovalComment").value,
           ApprovedBy: this.user.ID,
         };

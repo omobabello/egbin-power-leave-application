@@ -92,7 +92,7 @@ const routes = (app) => {
                     LeaveBalanceBefore,
                     LeaveBalanceAfter
                 };
-                const approval = await Leave.approveLeave(leave);
+                const approval = await Leave.approveLeave(request.body.LeaveType,workingDays,leave,request.body.RequestedBy);
                 response.json({
                     success: true,
                     approval
